@@ -1,6 +1,6 @@
 ### Installing project requirements through uv
 
-After installing uv globally, you can create a local project-specific environment by running the following command:
+After [installing uv globally](https://docs.astral.sh/uv/getting-started/installation/), you can create a local project-specific environment by running the following command:
 
 ```
 uv sync
