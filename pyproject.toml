@@ -16,3 +16,8 @@ dependencies = [
     "nbformat==5.10.4",
     "kaleido==0.2.1"
 ]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+]
