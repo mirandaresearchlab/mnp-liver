@@ -7,12 +7,16 @@ from sklearn.mixture import GaussianMixture
 from sklearn.metrics import silhouette_score, silhouette_samples
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from utils import convert_concentration
+from config import setup_logging
 import os
 
 def perform_clustering_analysis(X_scaled, df, metadata_column, csv_data, save_dir, 
                                range_n_clusters=[2, 4, 5], range_n_components=[4], 
                                use_gmm=True, gmm_covariance_types=['full', 'tied']):
     """Perform clustering analysis with silhouette plots and concentration distribution."""
+    if save_dir:
+        setup_logging(save_dir)
+    
     X_scaled = X_scaled.astype('float32', copy=False)
     df[metadata_column] = df[metadata_column].apply(lambda x: x.lower().strip())
 

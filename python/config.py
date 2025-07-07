@@ -1,4 +1,7 @@
 from pathlib import Path
+import sys
+import datetime
+import os
 
 def configure_paths():
     """Configure paths for local or Docker environment."""
@@ -10,6 +13,15 @@ def configure_paths():
     csv_data = "df_SingleCell_AO_HEPG2_110341.csv" # "df_HUH7_SingleCell_102912.csv", "df_HUH7_SingleCell_110341.csv", "df_HUH7_SingleCell_191735.csv"
     metadata_column = "Metadata_concentration_perliter" # "Metadata_concentration_perliter_x"
     return save_dir, csv_path / csv_data, metadata_column
+
+def setup_logging(save_dir):
+    """Set up logging to write print statements to a log file with dynamic timestamp."""
+    date_time_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_file = save_dir / f"log_{date_time_str}.txt"
+    log_file.parent.mkdir(parents=True, exist_ok=True)  # Ensure directory exists
+    log_handle = open(log_file, 'w', encoding='utf-8')
+    sys.stdout = log_handle
+    return log_handle
 
 def get_range_n_components(num_classes):
     """Generate RANGE_N_COMPONENTS based on num_classes."""

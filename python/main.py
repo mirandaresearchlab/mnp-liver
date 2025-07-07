@@ -1,8 +1,9 @@
 import numpy as np
-from config import configure_paths, RANDOM_SEED, PERCENTAGE_TO_KEEP, RANGE_N_CLUSTERS, USE_GMM, GMM_COVARIANCE_TYPES, get_range_n_components
+from config import configure_paths, RANDOM_SEED, PERCENTAGE_TO_KEEP, RANGE_N_CLUSTERS, USE_GMM, GMM_COVARIANCE_TYPES, get_range_n_components, setup_logging
 from preprocessing import load_and_filter_data, preprocess_dataframe
 from visualization import plot_dimensionality_reduction
 from clustering import perform_clustering_analysis
+import sys
 
 # Set random seed
 np.random.seed(RANDOM_SEED)
@@ -12,8 +13,11 @@ def main():
     # Load configuration
     save_dir, file_path, metadata_column = configure_paths()
     
+    # Initialize logging
+    log_handle = setup_logging(save_dir)
+    
     # Load and filter data
-    df_filtered, num_classes = load_and_filter_data(file_path, metadata_column, PERCENTAGE_TO_KEEP)
+    df_filtered, num_classes = load_and_filter_data(file_path, metadata_column, PERCENTAGE_TO_KEEP, save_dir)
     
     # Get RANGE_N_COMPONENTS based on num_classes
     RANGE_N_COMPONENTS = get_range_n_components(num_classes)
@@ -31,13 +35,13 @@ def main():
             plot_dimensionality_reduction(
                 data['X_scaled'], data['df'], data['valid_columns'], metadata_column,
                 method, f"{method} of {file_path.name}", continuous=False, n_components=2,
-                save_path=str(save_dir / f"{file_path.name}_{method}")
+                save_path=str(save_dir / f"{file_path.name}_{method}"), save_dir=save_dir
             )
             # 3D categorical plot
             plot_dimensionality_reduction(
                 data['X_scaled'], data['df'], data['valid_columns'], metadata_column,
                 method, f"{method} of {file_path.name}", continuous=False, n_components=3,
-                save_path=str(save_dir / f"{file_path.name}_{method}")
+                save_path=str(save_dir / f"{file_path.name}_{method}"), save_dir=save_dir
             )
         else:
             print(f"Warning: {metadata_column} not found in {name}.")
@@ -54,6 +58,11 @@ def main():
     
     # Free memory
     del df_filtered, X_scaled, preprocessed_data
+    
+    # Close log file
+    if log_handle:
+        log_handle.close()
+        sys.stdout = sys.__stdout__  # Restore original stdout
 
 if __name__ == "__main__":
     main()
