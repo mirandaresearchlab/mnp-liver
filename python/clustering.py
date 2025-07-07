@@ -10,16 +10,16 @@ from utils import convert_concentration
 import os
 
 def perform_clustering_analysis(X_scaled, df, metadata_column, csv_data, save_dir, 
-                               range_n_clusters=[2, 4, 5], range_n_components=[4], 
-                               use_gmm=True, gmm_covariance_types=['full', 'tied']):
+                               range_n_clusters=[2, 3, 4], range_n_components=[3], 
+                               use_gmm=True, gmm_covariance_types=['full']):
     """Perform clustering analysis with silhouette plots and concentration distribution."""
-    X_scaled = X_scaled.astype('float32', copy=False)
+    # X_scaled = X_scaled.astype('float32', copy=False)
     df[metadata_column] = df[metadata_column].apply(lambda x: x.lower().strip())
 
     for n_comp in range_n_components:
         try:
             reducer = LDA(n_components=n_comp)
-            X_reduced = reducer.fit_transform(X_scaled, df[metadata_column]).astype('float32')
+            X_reduced = reducer.fit_transform(X_scaled, df[metadata_column])
         except ValueError as e:
             print(f"Error with LDA n_components={n_comp}: {e}")
             continue
@@ -39,7 +39,7 @@ def perform_clustering_analysis(X_scaled, df, metadata_column, csv_data, save_di
 
                     cluster_labels = clusterer.fit_predict(X_reduced)
                     centers = clusterer.means_ if use_gmm else clusterer.cluster_centers_
-                    centers = centers.astype('float32')
+                    # centers = centers.astype('float32')
                 except Exception as e:
                     print(f"Error in clustering for n_components={n_comp}, n_clusters={n_clusters}, {algo_name}: {e}")
                     plt.close(fig)

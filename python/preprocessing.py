@@ -40,7 +40,8 @@ def preprocess_dataframe(df, nan_threshold=0.0001):
     feature_columns = [col for col in df.columns if not (col.startswith(('Metadata_', 'Image_')) or col.endswith('_ObjectNumber'))]
     print(f"Number of feature columns: {len(feature_columns)}")
     
-    X = df[feature_columns].astype('float32', copy=False)
+    # X = df[feature_columns].astype('float32', copy=False)
+    X = df[feature_columns]
     
     # Check for NaN and Inf
     nan_counts = X.isna().sum()
@@ -76,7 +77,8 @@ def preprocess_dataframe(df, nan_threshold=0.0001):
         raise ValueError("No rows/columns remain after preprocessing.")
     
     scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X).astype('float32')
+    # X_scaled = scaler.fit_transform(X).astype('float32')
+    X_scaled = scaler.fit_transform(X)
     
     del X  # Free memory
     return X_scaled, valid_columns

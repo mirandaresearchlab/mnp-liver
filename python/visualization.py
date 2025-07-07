@@ -12,7 +12,7 @@ def plot_dimensionality_reduction(X_scaled, df, valid_columns, metadata_column, 
                                  tsne_perplexity=30, n_neighbors=15, min_dist=0.1, continuous=False, 
                                  n_components=2, save_path=None):
     """Plot dimensionality reduction results using Plotly."""
-    X_scaled = X_scaled.astype('float32', copy=False)
+    # X_scaled = X_scaled.astype('float32', copy=False)
     
     if method_name == 'PCA':
         reducer = PCA(n_components=n_components)
@@ -35,7 +35,7 @@ def plot_dimensionality_reduction(X_scaled, df, valid_columns, metadata_column, 
 
     try:
         X_reduced = (reducer.fit_transform(X_scaled, df[metadata_column]) if method_name == 'LDA' 
-                     else reducer.fit_transform(X_scaled)).astype('float32')
+                     else reducer.fit_transform(X_scaled))
     except Exception as e:
         print(f"Error in {method_name} reduction: {e}")
         return None
@@ -45,7 +45,8 @@ def plot_dimensionality_reduction(X_scaled, df, valid_columns, metadata_column, 
     title_suffix = ' (Continuous)' if continuous else ' (Categorical)'
     
     if continuous:
-        concentrations = df[metadata_column].apply(convert_concentration).astype('float32')
+        # concentrations = df[metadata_column].apply(convert_concentration).astype('float32')
+        concentrations = df[metadata_column].apply(convert_concentration)
         if is_3d:
             fig.add_trace(go.Scatter3d(
                 x=X_reduced[:, 0], y=X_reduced[:, 1], z=X_reduced[:, 2], mode='markers',
