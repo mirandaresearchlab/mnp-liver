@@ -7,15 +7,11 @@ from sklearn.manifold import TSNE
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 import umap.umap_ as umap
 from utils import convert_concentration
-from config import setup_logging
 
 def plot_dimensionality_reduction(X_scaled, df, valid_columns, metadata_column, method_name, title, 
                                  tsne_perplexity=30, n_neighbors=15, min_dist=0.1, continuous=False, 
-                                 n_components=2, save_path=None, save_dir=None):
+                                 n_components=2, save_path=None):
     """Plot dimensionality reduction results using Plotly."""
-    if save_dir:
-        setup_logging(save_dir)
-    
     X_scaled = X_scaled.astype('float32', copy=False)
     
     if method_name == 'PCA':

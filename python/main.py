@@ -1,12 +1,23 @@
 import numpy as np
-from config import configure_paths, RANDOM_SEED, PERCENTAGE_TO_KEEP, RANGE_N_CLUSTERS, USE_GMM, GMM_COVARIANCE_TYPES, get_range_n_components, setup_logging
+import sys
+import datetime
+from pathlib import Path
+from config import configure_paths, RANDOM_SEED, PERCENTAGE_TO_KEEP, RANGE_N_CLUSTERS, USE_GMM, GMM_COVARIANCE_TYPES, get_range_n_components
 from preprocessing import load_and_filter_data, preprocess_dataframe
 from visualization import plot_dimensionality_reduction
 from clustering import perform_clustering_analysis
-import sys
 
 # Set random seed
 np.random.seed(RANDOM_SEED)
+
+def setup_logging(save_dir):
+    """Set up logging to write print statements to a single log file with dynamic timestamp."""
+    date_time_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_file = save_dir / f"log_{date_time_str}.txt"
+    log_file.parent.mkdir(parents=True, exist_ok=True)  # Ensure directory exists
+    log_handle = open(log_file, 'a', encoding='utf-8')  # Use 'a' for append mode
+    sys.stdout = log_handle
+    return log_handle
 
 def main():
     """Main function to execute the analysis pipeline."""
@@ -17,7 +28,7 @@ def main():
     log_handle = setup_logging(save_dir)
     
     # Load and filter data
-    df_filtered, num_classes = load_and_filter_data(file_path, metadata_column, PERCENTAGE_TO_KEEP, save_dir)
+    df_filtered, num_classes = load_and_filter_data(file_path, metadata_column, PERCENTAGE_TO_KEEP)
     
     # Get RANGE_N_COMPONENTS based on num_classes
     RANGE_N_COMPONENTS = get_range_n_components(num_classes)
@@ -35,13 +46,13 @@ def main():
             plot_dimensionality_reduction(
                 data['X_scaled'], data['df'], data['valid_columns'], metadata_column,
                 method, f"{method} of {file_path.name}", continuous=False, n_components=2,
-                save_path=str(save_dir / f"{file_path.name}_{method}"), save_dir=save_dir
+                save_path=str(save_dir / f"{file_path.name}_{method}")
             )
             # 3D categorical plot
             plot_dimensionality_reduction(
                 data['X_scaled'], data['df'], data['valid_columns'], metadata_column,
                 method, f"{method} of {file_path.name}", continuous=False, n_components=3,
-                save_path=str(save_dir / f"{file_path.name}_{method}"), save_dir=save_dir
+                save_path=str(save_dir / f"{file_path.name}_{method}")
             )
         else:
             print(f"Warning: {metadata_column} not found in {name}.")

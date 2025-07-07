@@ -1,13 +1,9 @@
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
-from config import setup_logging
 
-def load_and_filter_data(file_path, metadata_column, percentage_to_keep=50, save_dir=None):
+def load_and_filter_data(file_path, metadata_column, percentage_to_keep=50):
     """Load and filter CSV data, keeping specified percentage of '0' entries."""
-    if save_dir:
-        setup_logging(save_dir)
-    
     df = pd.read_csv(file_path, sep=",", header=0, dtype={metadata_column: 'string'})
     
     print(f"Unique values in '{metadata_column}':")
