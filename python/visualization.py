@@ -7,6 +7,10 @@ from sklearn.manifold import TSNE
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 import umap.umap_ as umap
 from utils import convert_concentration
+from plotly.io import to_image
+from PIL import Image
+import io
+import os
 
 def plot_dimensionality_reduction(X_scaled, df, valid_columns, metadata_column, method_name, title, 
                                  tsne_perplexity=30, n_neighbors=15, min_dist=0.1, continuous=False, 
@@ -89,8 +93,22 @@ def plot_dimensionality_reduction(X_scaled, df, valid_columns, metadata_column, 
     )
     fig.update_layout(**layout, showlegend=True, legend=dict(itemsizing='constant'))
 
+    # if save_path:
+    #     fig.write_image(f"{save_path}_{'3D' if is_3d else '2D'}.png", width=1200, height=800)
+
     if save_path:
-        fig.write_image(f"{save_path}_{'3D' if is_3d else '2D'}.png", width=1200, height=800)
+        print(f"Saving plot to {save_path}_{'3D' if is_3d else '2D'}.png")
+        try:
+            # Ensure directory exists
+            os.makedirs(os.path.dirname(save_path) or '.', exist_ok=True)
+            # Convert Plotly figure to PNG bytes
+            img_bytes = to_image(fig, format="png", width=1200, height=800)
+            # Save directly with PIL
+            img = Image.open(io.BytesIO(img_bytes))
+            img.save(f"{save_path}_{'3D' if is_3d else '2D'}.png", format="PNG", optimize=True)
+            print(f"Saved to {save_path}_{'3D' if is_3d else '2D'}.png")
+        except Exception as e:
+            print(f"Failed to save image: {e}")
     
     del X_reduced
     return fig
