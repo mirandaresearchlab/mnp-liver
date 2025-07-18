@@ -17,10 +17,11 @@ def get_range_n_components(num_classes):
     max_components = num_classes - 1 if num_classes > 1 else 1
     # Generate range from 2 to max_components (or [2] if max_components < 2)
     return list(range(2, max_components + 1)) if max_components >= 2 else [2]
+    # return [max_components]
 
 # Global settings
 RANDOM_SEED = 42
 PERCENTAGE_TO_KEEP = 50
-RANGE_N_CLUSTERS = [2, 3]
+RANGE_N_CLUSTERS = [3, 4]
 USE_GMM = True
-GMM_COVARIANCE_TYPES = ['full', 'tied'] # ['full', 'tied', 'diag', 'spherical']  # Uncomment for more covariance types
+GMM_COVARIANCE_TYPES = ['full'] # ['full', 'tied', 'diag', 'spherical']  # Uncomment for more covariance types

@@ -9,14 +9,20 @@ import umap.umap_ as umap
 from utils import convert_concentration
 from plotly.io import to_image
 from PIL import Image
+from sklearn.feature_selection import VarianceThreshold
 import io
 import os
 
 def plot_dimensionality_reduction(X_scaled, df, valid_columns, metadata_column, method_name, title, 
                                  tsne_perplexity=30, n_neighbors=15, min_dist=0.1, continuous=False, 
                                  n_components=2, save_path=None):
-    """Plot dimensionality reduction results using Plotly."""
-    # X_scaled = X_scaled.astype('float32', copy=False)
+
+    """ OPTIONAL: Feature selection to reduce dimensionality before applying the method """
+    # print("X_scaled shape:", X_scaled.shape)
+    # selector = VarianceThreshold(threshold=0.01)
+    # X_scaled = selector.fit_transform(X_scaled)
+    # print(f"Reduced X_scaled shape by feature selection of variance threshold=0.01: {X_scaled.shape}")
+    """ OPTIONAL """
     
     if method_name == 'PCA':
         reducer = PCA(n_components=n_components)

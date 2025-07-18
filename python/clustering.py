@@ -7,13 +7,20 @@ from sklearn.mixture import GaussianMixture
 from sklearn.metrics import silhouette_score, silhouette_samples
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from utils import convert_concentration
+from sklearn.feature_selection import VarianceThreshold
 import os
 
 def perform_clustering_analysis(X_scaled, df, metadata_column, csv_data, save_dir, 
                                range_n_clusters=[2, 3, 4], range_n_components=[3], 
                                use_gmm=True, gmm_covariance_types=['full']):
-    """Perform clustering analysis with silhouette plots and concentration distribution."""
-    # X_scaled = X_scaled.astype('float32', copy=False)
+    
+    """ OPTIONAL: Feature selection to reduce dimensionality before applying the method """
+    # print("X_scaled shape:", X_scaled.shape)
+    # selector = VarianceThreshold(threshold=0.01)
+    # X_scaled = selector.fit_transform(X_scaled)
+    # print(f"Reduced X_scaled shape by feature selection of variance threshold=0.01: {X_scaled.shape}")
+    """ OPTIONAL """
+
     df[metadata_column] = df[metadata_column].apply(lambda x: x.lower().strip())
 
     for n_comp in range_n_components:
