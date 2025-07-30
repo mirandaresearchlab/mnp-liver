@@ -34,7 +34,7 @@ uv run python your_script.py
 
 You can explore and execute the analysis using either Jupyter notebook or standalone Python script:
 
-### Option A: Jupyter Notebook
+**Option A: Jupyter Notebook**
 
 For interactive exploration, open the following notebook:
 
@@ -45,10 +45,10 @@ For interactive exploration, open the following notebook:
 To launch Jupyter Lab:
 
 ```bash
-uv run jupyter lab
+jupyter lab
 ```
 
-### Option B: Python Script
+**Option B: Python Script**
 
 To run the full pipeline non-interactively:
 
