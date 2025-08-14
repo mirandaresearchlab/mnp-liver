@@ -1,4 +1,4 @@
-# 🧬 Single-Cell Morphological Data Analysis
+# Single-Cell Morphological Data Analysis
 
 This repository provides a pipeline for downstream analysis of single-cell morphological profiles. It includes steps for **dimensionality reduction** and **unsupervised clustering**, enabling the exploration of phenotypic heterogeneity at the single-cell level.
 
@@ -27,7 +27,7 @@ source .venv/bin/activate
 **Option 2: Run Python scripts using `uv`**
 
 ```bash
-uv run python your_script.py
+uv run your_script.py
 ```
 
 ## 🚀 2. Running the Feature Analysis Pipeline
