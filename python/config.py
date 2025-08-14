@@ -6,10 +6,17 @@ def configure_paths():
     csv_dir = Path("/home/jen-hungwang/Documents/mnp-liver/csv")
     # save_dir = Path("/storage/jenhung/results/mnp/")  # Uncomment for Docker
     # csv_dir = Path("/storage/jenhung/data/mnp_liver")  # Uncomment for Docker
-    csv_path = csv_dir / "hep" # hep or huh
-    csv_data = "df_SingleCell_AO_HEPG2_110341.csv" # "df_HUH7_SingleCell_102912.csv", "df_HUH7_SingleCell_110341.csv", "df_HUH7_SingleCell_191735.csv"
-    metadata_column = "Metadata_concentration_perliter" # "Metadata_concentration_perliter_x"
-    return save_dir, csv_path / csv_data, metadata_column
+    cell_type = "HepG2"  # or "HUH7"
+    csv_path = csv_dir / cell_type  # hep or huh
+    csv_data = [
+        "df_SingleCell_AO_HEPG2_102912.csv",
+        "df_SingleCell_AO_HEPG2_110341.csv",  
+        "df_SingleCell_AO_HEPG2_231222.csv"
+    ]
+    metadata_column = "Metadata_concentration_perliter"  # "Metadata_concentration_perliter_x"
+    well_column = "Metadata_Well"
+    dim_reduction = "LDA"  # or "PCA", "UMAP", etc.
+    return save_dir, [csv_path / file for file in csv_data], metadata_column, well_column, cell_type, dim_reduction
 
 def get_range_n_components(num_classes):
     """Generate RANGE_N_COMPONENTS based on num_classes."""
@@ -21,7 +28,7 @@ def get_range_n_components(num_classes):
 
 # Global settings
 RANDOM_SEED = 42
-PERCENTAGE_TO_KEEP = 50
+# PERCENTAGE_TO_KEEP = 50
 RANGE_N_CLUSTERS = [3, 4]
 USE_GMM = True
 GMM_COVARIANCE_TYPES = ['full'] # ['full', 'tied', 'diag', 'spherical']  # Uncomment for more covariance types

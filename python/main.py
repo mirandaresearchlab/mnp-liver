@@ -2,8 +2,8 @@ import numpy as np
 import sys
 import datetime
 from pathlib import Path
-from config import configure_paths, RANDOM_SEED, PERCENTAGE_TO_KEEP, RANGE_N_CLUSTERS, USE_GMM, GMM_COVARIANCE_TYPES, get_range_n_components
-from preprocessing import load_and_filter_data, preprocess_dataframe
+from config import configure_paths, RANDOM_SEED, RANGE_N_CLUSTERS, USE_GMM, GMM_COVARIANCE_TYPES, get_range_n_components
+from preprocessing import concatenate_dataframes, load_and_balance_data, preprocess_dataframe
 from visualization import plot_dimensionality_reduction
 from clustering import perform_clustering_analysis
 
@@ -22,37 +22,32 @@ def setup_logging(save_dir):
 def main():
     """Main function to execute the analysis pipeline."""
     # Load configuration
-    save_dir, file_path, metadata_column = configure_paths()
-    
+    save_dir, file_paths, metadata_column, well_column, cell_type, dim_reduction = configure_paths()
+
     # Initialize logging
     log_handle = setup_logging(save_dir)
-    
-    # Load and filter data
-    df_filtered, num_classes = load_and_filter_data(file_path, metadata_column, PERCENTAGE_TO_KEEP)
-    
+
+    # Preprcess and concatenate dataframes
+    preprocessed_data, num_classes = concatenate_dataframes(file_paths, metadata_column, well_column)
+
     # Get RANGE_N_COMPONENTS based on num_classes
     RANGE_N_COMPONENTS = get_range_n_components(num_classes)
-    print(f"RANGE_N_COMPONENTS set to: {RANGE_N_COMPONENTS}")
+    print(f"RANGE_N_COMPONENTS: {RANGE_N_COMPONENTS}")
     
-    # Preprocess data
-    X_scaled, valid_columns = preprocess_dataframe(df_filtered)
-    preprocessed_data = {'df': {'X_scaled': X_scaled, 'valid_columns': valid_columns, 'df': df_filtered}}
-    
-    # Dimensionality reduction with LDA
-    method = 'LDA'
+    # Dimensionality reduction
     for name, data in preprocessed_data.items():
         if metadata_column in data['df'].columns:
             # 2D categorical plot
             plot_dimensionality_reduction(
-                data['X_scaled'], data['df'], data['valid_columns'], metadata_column,
-                method, f"{method} of {file_path.name}", continuous=False, n_components=2,
-                save_path=str(save_dir / f"{file_path.name}_{method}")
+                data['X_normalized'], data['df'], data['valid_columns'], metadata_column,
+                dim_reduction, f"{dim_reduction} of {cell_type}", continuous=False, n_components=2,
+                save_path=str(save_dir / f"{cell_type}_{dim_reduction}")
             )
             # 3D categorical plot
             plot_dimensionality_reduction(
-                data['X_scaled'], data['df'], data['valid_columns'], metadata_column,
-                method, f"{method} of {file_path.name}", continuous=False, n_components=3,
-                save_path=str(save_dir / f"{file_path.name}_{method}")
+                data['X_normalized'], data['df'], data['valid_columns'], metadata_column,
+                dim_reduction, f"{dim_reduction} of {cell_type}", continuous=False, n_components=3,
+                save_path=str(save_dir / f"{cell_type}_{dim_reduction}")
             )
         else:
             print(f"Warning: {metadata_column} not found in {name}.")
@@ -61,14 +56,14 @@ def main():
     for name, data in preprocessed_data.items():
         if metadata_column in data['df'].columns:
             perform_clustering_analysis(
-                data['X_scaled'], data['df'], metadata_column, file_path.name, save_dir,
+                data['X_normalized'], data['df'], metadata_column, cell_type, save_dir,
                 RANGE_N_CLUSTERS, RANGE_N_COMPONENTS, USE_GMM, GMM_COVARIANCE_TYPES
             )
         else:
             print(f"Warning: {metadata_column} not found in {name}.")
     
     # Free memory
-    del df_filtered, X_scaled, preprocessed_data
+    del preprocessed_data
     
     # Close log file
     if log_handle:
