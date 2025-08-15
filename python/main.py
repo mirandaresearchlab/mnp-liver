@@ -35,22 +35,22 @@ def main():
     print(f"RANGE_N_COMPONENTS: {RANGE_N_COMPONENTS}")
     
     # Dimensionality reduction
-    for name, data in preprocessed_data.items():
-        if metadata_column in data['df'].columns:
-            # 2D categorical plot
-            plot_dimensionality_reduction(
-                data['X_normalized'], data['df'], data['valid_columns'], metadata_column,
-                dim_reduction, f"{dim_reduction} of {cell_type}", continuous=False, n_components=2,
-                save_path=str(save_dir / f"{cell_type}_{dim_reduction}")
-            )
-            # 3D categorical plot
-            plot_dimensionality_reduction(
-                data['X_normalized'], data['df'], data['valid_columns'], metadata_column,
-                dim_reduction, f"{dim_reduction} of {cell_type}", continuous=False, n_components=3,
-                save_path=str(save_dir / f"{cell_type}_{dim_reduction}")
-            )
-        else:
-            print(f"Warning: {metadata_column} not found in {name}.")
+    # for name, data in preprocessed_data.items():
+    #     if metadata_column in data['df'].columns:
+    #         # 2D categorical plot
+    #         plot_dimensionality_reduction(
+    #             data['X_normalized'], data['df'], data['valid_columns'], metadata_column,
+    #             dim_reduction, f"{dim_reduction} of {cell_type}", continuous=False, n_components=2,
+    #             save_path=str(save_dir / f"{cell_type}_{dim_reduction}")
+    #         )
+    #         # 3D categorical plot
+    #         plot_dimensionality_reduction(
+    #             data['X_normalized'], data['df'], data['valid_columns'], metadata_column,
+    #             dim_reduction, f"{dim_reduction} of {cell_type}", continuous=False, n_components=3,
+    #             save_path=str(save_dir / f"{cell_type}_{dim_reduction}")
+    #         )
+    #     else:
+    #         print(f"Warning: {metadata_column} not found in {name}.")
     
     # Clustering analysis
     for name, data in preprocessed_data.items():

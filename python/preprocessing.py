@@ -52,7 +52,7 @@ def load_and_balance_data(file_path, metadata_column, well_column):
     """
 
     # Load and filter CSV data, keeping specified percentage of '0' entries.
-    df = pd.read_csv(file_path, sep=",", header=0, dtype={metadata_column: 'string'})
+    df = pd.read_csv(file_path, sep=",", header=0, dtype={metadata_column: 'string'}, low_memory=True)
     print(f"\n--- File: {file_path} ---")
 
     # Total value counts for metadata_column
@@ -78,15 +78,12 @@ def load_and_balance_data(file_path, metadata_column, well_column):
         num_wells = len(df[df[metadata_column] == conc][well_column].unique())
         print(f"Number of unique wells for {metadata_column} = {conc}: {num_wells}")
 
-    # Delete grouped_counts to free memory
-    del grouped_counts
-
     # Find the minimum count of rows among all metadata_column values
     min_count = conc_counts.min()
     print(f"\nMinimum row count among {metadata_column} values: {min_count}")
 
-    # Delete conc_counts and well_counts to free memory
-    del conc_counts, well_counts
+    # Delete them to free memory
+    del grouped_counts, conc_counts, well_counts
 
     # Initialize an empty list to store indices to keep
     keep_indices = []
@@ -94,8 +91,7 @@ def load_and_balance_data(file_path, metadata_column, well_column):
     # Process each concentration value
     for conc in df[metadata_column].unique():
         # Subset for the current concentration
-        conc_mask = df[metadata_column] == conc
-        conc_df = df[conc_mask]
+        conc_df = df[df[metadata_column] == conc]
 
         # Get the proportion of each well in this concentration
         well_proportions = conc_df[well_column].value_counts(normalize=True)
@@ -110,8 +106,7 @@ def load_and_balance_data(file_path, metadata_column, well_column):
 
         # Randomly sample rows for each well
         for well in rows_to_keep.index:
-            well_mask = conc_df[well_column] == well
-            well_indices = conc_df[well_mask].index
+            well_indices = conc_df[conc_df[well_column] == well].index
             if rows_to_keep[well] > 0:
                 selected_indices = np.random.default_rng(42).choice(
                     well_indices, size=rows_to_keep[well], replace=False
@@ -142,7 +137,7 @@ def preprocess_dataframe(df, nan_threshold=0.0001):
     print(f"Number of feature columns: {len(feature_columns)}")
     
     # X = df[feature_columns].astype('float32', copy=False)
-    X = df[feature_columns].copy()
+    X = df[feature_columns]
     
     # Check for NaN and Inf
     nan_counts = X.isna().sum()
@@ -208,7 +203,7 @@ def preprocess_dataframe(df, nan_threshold=0.0001):
     # Normalize: (x - median) / MAD
     X_normalized = (X - medians) / mad
     
-    del X  # Free memory
+    del X, nan_counts, inf_counts, invalid_columns, medians, mad  # Free memory
     return X_normalized, valid_columns
 
 def concatenate_dataframes(file_paths, metadata_column, well_column):
@@ -219,19 +214,17 @@ def concatenate_dataframes(file_paths, metadata_column, well_column):
     # Loop through each file path
     for file_path in file_paths:
         # Load and filter data
-        df_filtered, num_classes = load_and_balance_data(file_path, metadata_column, well_column)
+        df_filtered, _ = load_and_balance_data(file_path, metadata_column, well_column)
 
         # Preprocess data
         X_normalized, valid_columns = preprocess_dataframe(df_filtered)
         preprocessed_results.append({'X_normalized': X_normalized, 'valid_columns': valid_columns, 'df': df_filtered})
         print(f"Preprocessed {file_path} with {len(valid_columns)} valid columns.\n")
 
-        del df_filtered
-        del X_normalized  # Free memory
-        del valid_columns  # Free memory
+        del df_filtered, X_normalized, valid_columns
 
     # Concatenate preprocessed data
-    concatenated_df = pd.concat([res['df'] for res in preprocessed_results], ignore_index=True)
+    concatenated_df = pd.concat([res['df'] for res in preprocessed_results], ignore_index=True, copy=False)
     # Find common valid columns across all DataFrames
     common_valid_columns = list(set.intersection(*[set(res['valid_columns']) for res in preprocessed_results]))
     # Concatenate X_normalized arrays, selecting only common valid columns
@@ -243,6 +236,9 @@ def concatenate_dataframes(file_paths, metadata_column, well_column):
         ], axis=0)
     else:
         raise ValueError("No common valid columns found across DataFrames.")
+
+    del preprocessed_results
+
     preprocessed_data['concatenated_df'] = {
         'X_normalized': concatenated_X_normalized,
         'valid_columns': common_valid_columns,
@@ -255,8 +251,8 @@ def concatenate_dataframes(file_paths, metadata_column, well_column):
     print(f"Number of common valid columns: {len(common_valid_columns)}\n")
 
     # Delete intermediate variables to free memory
-    del preprocessed_results
-    del concatenated_df
-    del common_valid_columns
+    # del preprocessed_results
+    # del concatenated_df
+    # del common_valid_columns
 
     return preprocessed_data, num_classes
