@@ -199,6 +199,7 @@ def preprocess_dataframe(df, nan_threshold=0.0001):
     # Calculate MAD for each column: median(|x - median(x)|)
     mad = np.abs(X - medians).median()
     # Avoid division by zero by replacing 0 with 1
+    print("Median Absolute Deviation (MAD): ", mad)
     mad = mad.replace(0, 1.0)
     # Normalize: (x - median) / MAD
     X_normalized = (X - medians) / mad
