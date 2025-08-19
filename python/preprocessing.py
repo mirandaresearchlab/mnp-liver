@@ -55,6 +55,15 @@ def load_and_balance_data(file_path, metadata_column, well_column):
     df = pd.read_csv(file_path, sep=",", header=0, dtype={metadata_column: 'string'}, low_memory=True)
     print(f"\n--- File: {file_path} ---")
 
+    # Exclude rows where metadata_column == "1.6ug", only if present
+    if (df[metadata_column] == "1.6ug").any():
+        initial_len = len(df)
+        df = df[df[metadata_column] != "1.6ug"]
+        removed = initial_len - len(df)
+        print(f"Excluded {removed} rows where {metadata_column} == '1.6ug'")
+    else:
+        print(f"No rows with {metadata_column} == '1.6ug' found. Skipping exclusion.")
+
     # Total value counts for metadata_column
     conc_counts = df[metadata_column].value_counts()
     print(f"\nTotal value counts for '{metadata_column}':")
