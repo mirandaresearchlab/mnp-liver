@@ -226,6 +226,8 @@ def concatenate_dataframes(file_paths, metadata_column, well_column):
         # Load and filter data
         df_filtered, _ = load_and_balance_data(file_path, metadata_column, well_column)
 
+        print(f"df_filtered: {df_filtered.shape}")
+
         # Preprocess data
         X_normalized, valid_columns = preprocess_dataframe(df_filtered)
         preprocessed_results.append({'X_normalized': X_normalized, 'valid_columns': valid_columns, 'df': df_filtered})
@@ -235,6 +237,7 @@ def concatenate_dataframes(file_paths, metadata_column, well_column):
 
     # Concatenate preprocessed data
     concatenated_df = pd.concat([res['df'] for res in preprocessed_results], ignore_index=True, copy=False)
+    print(f"Concatenated DataFrame shape: {concatenated_df.shape}")
     # Find common valid columns across all DataFrames
     common_valid_columns = list(set.intersection(*[set(res['valid_columns']) for res in preprocessed_results]))
     # Concatenate X_normalized arrays, selecting only common valid columns
