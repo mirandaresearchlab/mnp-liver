@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
-from sklearn.metrics import silhouette_score, silhouette_samples
+from sklearn.metrics import silhouette_score, silhouette_samples, calinski_harabasz_score
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from utils import convert_concentration
 from sklearn.feature_selection import VarianceThreshold
@@ -53,7 +53,9 @@ def perform_clustering_analysis(X_scaled, df, metadata_column, csv_data, save_di
                     continue
 
                 silhouette_avg = silhouette_score(X_reduced, cluster_labels)
-                print(f"For n_components={n_comp}, n_clusters={n_clusters}, {algo_name}, silhouette_score={silhouette_avg:.4f}")
+                ch_score = calinski_harabasz_score(X_reduced, cluster_labels)
+                print(f"For n_components={n_comp}, n_clusters={n_clusters}, {algo_name}, "
+                      f"silhouette_score={silhouette_avg:.4f}, calinski_harabasz_score={ch_score:.4f}")
 
                 # Silhouette Plot
                 ax1.set_xlim([-0.1, 1])
@@ -119,7 +121,7 @@ def perform_clustering_analysis(X_scaled, df, metadata_column, csv_data, save_di
                 ax3.legend()
 
                 plt.suptitle(
-                    f"{csv_data} - Analysis with {algo_name}, Silhouette={silhouette_avg:.4f}, "
+                    f"{csv_data} - Analysis with {algo_name}, Silhouette={silhouette_avg:.4f}, Calinski-Harabasz score={ch_score:.4f}, "
                     f"n_clusters={n_clusters}, LDA={n_comp}D",
                     fontsize=14, fontweight="bold"
                 )
